@@ -1,5 +1,6 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html>
+<link rel="stylesheet" type="text/css" href="styles.css">
 <head>
     
 	<title>Doctor Appointment Viewer</title>
@@ -25,42 +26,83 @@
 <h1><center> Discount Clinic <center></h1>
 </head>
 <body>
+	<nav>
+		<ul>
+			<li class ="active"><a href="doctorhomepage.php">Home</a></li>
+			<li><a href="doctor_profile.php">Profile</a></li>
+			<li><a href="doctorappointments.php">Appointments</a></li>
+			<li><a href ="doctor_form.php">Doctor Form</a></li>
+			<li><a href="logout.php">Logout</a></li>
+		</ul>
+	</nav>
+</body>
+
+<body>
 	<h2>Scheduled Appointments</h2>
 	<table>
 		<thead>
 			<tr>
-				<th>Date</th>
-				<th>Time</th>
-				<th>Patient Name</th>
-				<th>Reason for Visit</th>
+				<th>Appointment ID</th>
+			    <th>Patient Name</th>
+			    <th>Date</th>
+			    <th>Time</th>
+			    <th>Office Location</t>
 			</tr>
 		</thead>
-		<tbody>
-			<tr>
-				<td>March 28, 2023</td>
-				<td>10:00 AM</td>
-				<td>John Doe</td>
-				<td>General Checkup</td>
-			</tr>
-			<tr>
-				<td>March 28, 2023</td>
-				<td>2:30 PM</td>
-				<td>Jane Smith</td>
-				<td>Flu-like Symptoms</td>
-			</tr>
-			<tr>
-				<td>March 29, 2023</td>
-				<td>9:15 AM</td>
-				<td>Mike Johnson</td>
-				<td>High Blood Pressure</td>
-			</tr>
-			<tr>
-				<td>March 29, 2023</td>
-				<td>1:45 PM</td>
-				<td>Susan Lee</td>
-				<td>Sore Throat</td>
-			</tr>
+	<tbody>
+		<?php
+			if ($result->num_rows > 0) {
+				while ($row = $result->fetch_assoc()) {
+					echo "<tr>";
+					echo "<td>" . $row['appointment_id'] . "</td>";
+					echo "<td>" . $row['first_name'] . " " . $row['last_name'] ."</td>";
+					echo "<td>" . $row['date'] . "</td>";
+					echo "<td>" . $row['time'] . "</td>";
+					echo "<td>" . $row['street_address'] . " " . $row['city'] . " " . $row['state'] . " " . $row['zip'] . "</td>";
+					echo "</tr>";
+				}
+			} else {
+				echo "<tr><td colspan='5'>No appointments found.</td></tr>";
+			}
+			$conn->close();
+		?>
 		</tbody>
 	</table>
 </body>
 </html>
+
+<?php 
+session_start();
+
+	include("dbh-inc.php");
+	include("functions.php");
+
+	$user_data = check_login($conn);
+
+	$TEST = $user_data['username'];
+	$query = "SELECT user_id FROM user WHERE username = '$TEST'";
+	$result = mysqli_query($conn, $query);
+	if($result && mysqli_num_rows($result) > 0) {
+		$user_data = mysqli_fetch_assoc($result);
+		$user_id = $user_data['user_id'];
+	} 
+
+	$query = "SELECT doctor_id FROM doctor WHERE user_id = '$user_id'";
+	$result = mysqli_query($conn, $query);
+
+	if($result && mysqli_num_rows($result) > 0) {
+		$doctor_data = mysqli_fetch_assoc($result);
+		$doctor_id = $doctor_data['doctor_id'];
+	}
+	
+	$sql = "SELECT * FROM appointment WHERE doctor_id = '$doctor_id' AND deleted = FALSE";
+
+	$sql = "SELECT * 
+	FROM discount_clinic.appointment, discount_clinic.office, discount_clinic.address, discount_clinic.doctor
+	WHERE doctor.doctor_id = '$doctor_id' AND office.address_id = address.address_id AND appointment.office_id = office.office_id AND appointment.doctor_id = doctor.doctor_id";
+	$result = $conn->query($sql);
+
+
+	echo $result->num_row;
+
+?>

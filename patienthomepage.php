@@ -1,7 +1,5 @@
 <?php 
 session_start();
-//ob_start();
-
 	include("dbh-inc.php");
 	include("functions.php");
 
@@ -114,7 +112,6 @@ session_start();
 		if ($result->num_rows > 0) {
 			while ($row = $result->fetch_assoc()) {
 				echo "<tr>";
-				//echo "HELLO IM HERE";
 				echo "<td>" . $row['appointment_id'] . "</td>";
 				echo "<td>" . $row['first_name'] . " " . $row['last_name'] ."</td>";
 				echo "<td>" . $row['date'] . "</td>";
