@@ -1,1 +1,2 @@
-# Ben_Discount_Clinic
+# Discount-Clinic
+Medical Clinic Project
