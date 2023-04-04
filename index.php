@@ -14,4 +14,6 @@ ob_start();
 		header("Location: patienthomepage.php");
 	elseif($user_data['role']==='doctor')
 		header("Location: doctorhomepage.php");
+	elseif($user_data['role']==='admin')
+		header("Location: adminhomepage.php");
 ?>

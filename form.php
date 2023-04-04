@@ -1,7 +1,6 @@
 <?php
 ob_start();
 session_start();
-
 ?>
 
 <!DOCTYPE html>
@@ -166,16 +165,10 @@ session_start();
         <h1>Medical Health Information</h1>
         <label for="allergies">Allergies:</label>
         <input type="text" id="allergies" name="allergies">
-        <!-- <button type="submit" value="Submit"</button > -->
         <button type="submit" value="Submit">Submit</button>
 
         <form>
-            <!--Patient Information Form-->
 <?php
-    //ob_start();
-    //session_start();
-    
-    
 
 
     include("dbh-inc.php");
@@ -184,16 +177,8 @@ session_start();
     $user_data = check_login($conn);
     $user_id_fk = $user_data['user_ID'];
 
-    // Check if the form has been submitted
+
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Get input values
-        /*
-        $firstname =  $_POST['firstname'];
-        $last_name = $_POST['last_name'];
-        $gender = $_POST['gender'];
-        //print first name
-        echo $firstname;
-        */
 
         $firstname = $_POST['firstname'];
         $middleInitial = $_POST['middle-initial'];
@@ -223,11 +208,6 @@ session_start();
             // Retrieve generated address_id value
             $address_id = mysqli_insert_id($conn);
 
-            // Insert new patient record using the generated address_id value
-            /*
-            $sql_patient = "INSERT INTO patient (user_id, address_id, first_name, middle_initial, last_name, gender, phone_number, DOB, deleted) 
-            VALUES (NULL, $address_id, '$firstname', '$middleInitial', '$last_name', '$gender', '$phone', '$dob', 0)";
-            */
             $sql_patient = "INSERT INTO patient (user_id, address_id, first_name, middle_initial, last_name, gender, phone_number, DOB, total_owe, deleted) 
             VALUES ($user_id_fk, $address_id, '$firstname', '$middleInitial', '$last_name', '$gender', '$phone', '$dob', 0, 0)";
 
@@ -240,9 +220,6 @@ session_start();
                 VALUES ($patient_id, '$emergencyFirstName', '$emergencyMiddleInitial', '$emergencyLastName', '$emergencyPhone', '$relationship', 0)";
 
                 if (mysqli_query($conn, $sql_emergency)) {
-                    //echo "Records inserted successfully.";
-                    // Close the database connection
-                    //mysqli_close($conn);
                     mysqli_close($conn);
                     header("Location: " . $_SERVER['PHP_SELF']);
                     header("Location: thankyouForm.php");
@@ -255,47 +232,9 @@ session_start();
         } else {
             echo "ERROR: Could not able to execute $sql_address. " . mysqli_error($conn);
         }
-
-        /*
-        if (mysqli_query($conn, $sql_address) && mysqli_query($conn, $sql_patient) && mysqli_query($conn, $sql_emergency)) {
-
-            //echo "New record created successfully";
-
-            // Close the database connection
-
-            //make sur it executes
-
-
-
-            mysqli_close($conn);
-            header("Location: ".$_SERVER['PHP_SELF']);
-            header("Location: thankyouForm.php");
-        
-            //exit();
-
-            //header("Location: ./thankyouForm.php");
-            exit();
-            
-
-
-
-        } else {
-            echo "Error: " . $sql1 . "<br>" . mysqli_error($conn);
-            echo "Error: " . $sql2 . "<br>" . mysqli_error($conn);
-        }
-
-        // Close the database connection
-        mysqli_close($conn);
-        */
-
         mysqli_close($conn);
     }
-    //ob_end_flush();
+
     ?>
-
-
 </body>
-
-
-
 </html>

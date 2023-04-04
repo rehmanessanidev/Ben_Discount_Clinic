@@ -1,14 +1,14 @@
 <?php
  	session_start();
  	ob_start();
+	include("functions.php");
 
-	// include("connection.php");
 	include("dbh-inc.php");
 
+	
 
 	if($_SERVER['REQUEST_METHOD'] == "POST")
 	{
-		//somthing was posted
 		$role = $_POST['role'];
 		$username = $_POST['username'];
 		$password = $_POST['password'];
@@ -17,26 +17,43 @@
 		{
 			$checking_query = "SELECT * FROM user WHERE username = '$username' LIMIT 1";
 
-			$result = mysqli_query($conn, $checking_query);
+			$result =  mysqli_query($conn, $checking_query);
 
 			if($result && mysqli_num_rows($result) > 0){
 				echo "Username already taken";
 			}
-			/*
-			$checking_query = "SELECT COUNT(*) FROM user WHERE username = ('$username')";
-			//mysqli_query($conn, $checking_query);
-			if(($checking_query)>0)
-			{
-				echo "Username already taken";
-			}
-			*/
 			else{
 			$query = "INSERT INTO user (role,username,password) VALUES ('$role','$username','$password')";
-
-			//mysqli_query($con, $query);
 			mysqli_query($conn, $query);
+			// NEWCODE
 
-			header("Location: login.php");
+			$select_query = "SELECT * FROM user WHERE username = '$username' LIMIT 1";
+
+			$result = mysqli_query($conn, $select_query);
+
+			if($result){
+				if($result && mysqli_num_rows($result) > 0)
+				{
+					$user_data = mysqli_fetch_assoc($result);
+					if($user_data['password'] === $password && $user_data['role'] === $role)
+					{
+						$_SESSION['username'] = $user_data['username'];
+						header("Location: form.php");
+						die;
+					}
+					
+				}
+			}
+			// NEWCODE
+
+
+			// if($role == 'patient')
+			// 	header("Location: form.php");
+			// header("Location: form.php");
+
+			//if($role == 'doctor')
+				//header("Location: doctor_form.php");
+
 			die;
 			}
 		}
@@ -129,8 +146,8 @@
 
 			<input id="text" type="text" name="username" placeholder="Username"><br><br>
 			<input id="text" type="password" name="password" placeholder="Password"><br><br>
-				<input id="button" type="submit" value="REGISTER"><br><br>
-				<a href="login.php">Click to Login</a><br><br>
+			<input id="button" type="submit" value="REGISTER"><br><br>
+			<a href="login.php">Click to Login</a><br><br>
 			</div>
 		</form>
 	</div>
