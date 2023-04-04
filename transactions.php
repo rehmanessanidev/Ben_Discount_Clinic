@@ -48,7 +48,9 @@ session_start();
         h1 {
             font-size: 50px;
         }
+	
 	</style>
+	<
 	<h2> Make Payment </h2>
 	<form method = "post" action = "" >
 		<fieldset>
@@ -74,26 +76,38 @@ session_start();
 	<?php 
 		$username = $user_data['username'];
 
-			if($_SERVER['REQUEST_METHOD'] === 'POST'){
-				$moneyAmountInputted = $_POST['payment_amount'];
-				
-				$query_patient_id = "SELECT *
-				FROM discount_clinic.patient, discount_clinic.user, discount_clinic.appointment
-				WHERE patient.user_id = user.user_id AND appointment.patient_id = patient.patient_id AND user.username = '$username'";
-
-				$patient_info = $conn->query($query_patient_id);
-				$row = $patient_info->fetch_assoc();
-
-				$patient_id = $row["patient_id"];
-				$appointment_id = $row["appointment_id"];
-
-				
+		if($_SERVER['REQUEST_METHOD'] === 'POST'){
+			$moneyAmountInputted = $_POST['payment_amount'];
+			
+			$query_patient_id = "SELECT *
+			FROM discount_clinic.patient, discount_clinic.user, discount_clinic.appointment
+			WHERE patient.user_id = user.user_id AND appointment.patient_id = patient.patient_id AND user.username = '$username'";
+		  
+			$patient_info = $conn->query($query_patient_id);
+			$row = $patient_info->fetch_assoc();
+		  
+			$patient_id = $row["patient_id"];
+			$appointment_id = $row["appointment_id"];
+		  
+			// Get total_owe
+			$query_total_owe = "SELECT total_owe FROM discount_clinic.patient WHERE patient_id = $patient_id";
+			$result_total_owe = $conn->query($query_total_owe);
+			$row_total_owe = $result_total_owe->fetch_assoc();
+		  
+			$total_owe = $row_total_owe["total_owe"];
+		  
+			// Check if total_owe is greater than 0
+			if($total_owe > 0) {
+				// Insert transaction
 				$insertQ = "INSERT INTO discount_clinic.transaction (patient_id, appointment_id, amount, pay) 
-						VALUES ($patient_id, $appointment_id, $moneyAmountInputted, 1)";
-
+					VALUES ($patient_id, $appointment_id, $moneyAmountInputted, 1)";
 				mysqli_query($conn, $insertQ);
 			}
-
+			else {
+				echo 'Invalid Payment: Total Amount Owed is Zero';
+			}
+		}
+		
 
 		$query = 
 		"SELECT * 
